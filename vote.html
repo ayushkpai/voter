@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voter - Just Vote</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <div class="page">
+      <div class="outer">
+        <div class="card">
+          <h1>What do you think?</h1>
+          <p class="subtitle">Your opinion matters. Share your experience</p>
+          <div id="message" class="message"></div>
+          <div class="options">
+            <button class="option red" onclick="vote('Loved It')">
+              <span class="left">
+                <span class="emoji">❤️</span>
+                <span>Loved It</span>
+              </span>
+              <span class="arrow">→</span>
+            </button>
+
+            <button class="option blue" onclick="vote('Liked It')">
+              <span class="left">
+                <span class="emoji">👍</span>
+                <span>Liked It</span>
+              </span>
+              <span class="arrow">→</span>
+            </button>
+
+            <button class="option green" onclick="vote('Tried It')">
+              <span class="left">
+                <span class="emoji">😊</span>
+                <span>Tried It</span>
+              </span>
+              <span class="arrow">→</span>
+            </button>
+
+          </div>
+
+          <div class="divider">
+
+            <div class="results-header">
+              <div>
+                <h2 class="results-title">Voting Results</h2>
+                <p class="results-subtitle">Community feedback</p>
+              </div>
+
+              <div class="total-box">
+                <div class="total-number" id="total">0</div>
+                <div class="total-label">Total Votes</div>
+              </div>
+            </div>
+
+            <div class="result-item">
+              <div class="result-top">
+                <span class="result-name">❤️ Loved It</span>
+                <span class="result-count">
+                  <b id="lovedCount">0</b>
+                  <span class="muted">votes</span>
+                </span>
+              </div>
+              <div class="progress-bg">
+                <div class="progress progress-red" id="lovedBar"></div>
+              </div>
+            </div>
+
+            <div class="result-item">
+              <div class="result-top">
+                <span class="result-name">👍 Liked It</span>
+                <span class="result-count">
+                  <b id="likedCount">0</b>
+                  <span class="muted">votes</span>
+                </span>
+              </div>
+              <div class="progress-bg">
+                <div class="progress progress-blue" id="likedBar"></div>
+              </div>
+            </div>
+
+            <div class="result-item">
+              <div class="result-top">
+                <span class="result-name">😊 Tried It</span>
+                <span class="result-count">
+                  <b id="triedCount">0</b>
+                  <span class="muted">votes</span>
+                </span>
+              </div>
+              <div class="progress-bg">
+                <div class="progress progress-green" id="triedBar"></div>
+              </div>
+            </div>
+
+          </div>
+
+          <a href="/" class="back">← Back to Home</a>
+
+        </div>
+      </div>
+    </div>
+
+    <script>
+    let votes = {
+    "Loved It": 0,
+    "Liked It": 0,
+    "Tried It": 0
+    };
+
+    function vote(choice) {
+    votes[choice]++;
+    updateResults();
+
+    const message = document.getElementById("message");
+
+    message.className = "message success";
+    message.textContent = "Thank you! Your vote has been recorded.";
+
+    clearTimeout(window.messageTimer);
+
+    window.messageTimer = setTimeout(() => {
+    message.className = "message";
+    }, 2000);
+    }
+
+    function updateResults() {
+    const loved = votes["Loved It"];
+    const liked = votes["Liked It"];
+    const tried = votes["Tried It"];
+
+    const total = loved + liked + tried;
+
+    document.getElementById("total").textContent = total;
+
+    document.getElementById("lovedCount").textContent = loved;
+    document.getElementById("likedCount").textContent = liked;
+    document.getElementById("triedCount").textContent = tried;
+
+    document.getElementById("lovedBar").style.width =
+    (total ? loved / total * 100 : 0) + "%";
+
+    document.getElementById("likedBar").style.width =
+    (total ? liked / total * 100 : 0) + "%";
+
+    document.getElementById("triedBar").style.width =
+    (total ? tried / total * 100 : 0) + "%";
+    }
+
+    updateResults();
+    </script>
+
+  </body>
+</html>
+

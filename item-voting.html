@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voter - Item Voting</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+
+  <body>
+
+    <div class="page">
+      <div class="outer">
+        <div class="card">
+
+          <h1>Item Voting</h1>
+          <p class="subtitle">
+            Add items and share your experience!
+          </p>
+
+          <div id="message" class="message"></div>
+
+          <form class="input-group" id="addForm">
+            <input
+              type="text"
+              id="itemInput"
+              placeholder="Enter item name..."
+              maxlength="100"
+              required
+            >
+            <button class="add-button" type="submit">Add +</button>
+          </form>
+
+          <div id="itemList"></div>
+
+          <div class="divider">
+
+            <div class="results-header">
+              <div>
+                <h2 class="results-title">Voting Results</h2>
+                <p class="results-subtitle">All item feedback</p>
+              </div>
+
+              <div class="total-box">
+                <div class="total-number" id="total">0</div>
+                <div class="total-label">Total Votes</div>
+              </div>
+            </div>
+
+            <div class="result-item">
+              <div class="result-top">
+                <span class="result-name">❤️ Loved It</span>
+                <span class="result-count">
+                  <b id="lovedCount">0</b>
+                  <span class="muted">votes</span>
+                </span>
+              </div>
+              <div class="progress-bg">
+                <div class="progress progress-red" id="lovedBar"></div>
+              </div>
+            </div>
+
+            <div class="result-item">
+              <div class="result-top">
+                <span class="result-name">👍 Liked It</span>
+                <span class="result-count">
+                  <b id="likedCount">0</b>
+                  <span class="muted">votes</span>
+                </span>
+              </div>
+              <div class="progress-bg">
+                <div class="progress progress-blue" id="likedBar"></div>
+              </div>
+            </div>
+
+            <div class="result-item">
+              <div class="result-top">
+                <span class="result-name">😊 Tried It</span>
+                <span class="result-count">
+                  <b id="triedCount">0</b>
+                  <span class="muted">votes</span>
+                </span>
+              </div>
+              <div class="progress-bg">
+                <div class="progress progress-green" id="triedBar"></div>
+              </div>
+            </div>
+
+          </div>
+
+          <a href="/" class="back">← Back to Home</a>
+
+        </div>
+      </div>
+    </div>
+
+    <script>
+    // Independent in-memory item voting data.
+    // All items and votes reset on refresh.
+
+    let items = [];
+
+    let nextId = 1;
+
+    const itemList = document.getElementById("itemList");
+
+    const addForm = document.getElementById("addForm");
+
+    const itemInput = document.getElementById("itemInput");
+
+    function addItem(event) {
+    event.preventDefault();
+
+    const name = itemInput.value.trim();
+
+    if (!name) return;
+
+    items.push({
+    id: nextId++,
+    name: name,
+    loved: 0,
+    liked: 0,
+    tried: 0
+    });
+
+    itemInput.value = "";
+
+    renderItems();
+    updateResults();
+
+    showMessage("Item added successfully!", "success");
+
+    itemInput.focus();
+    }
+
+    function showMessage(text, type) {
+    const message = document.getElementById("message");
+
+    message.className = "message " + type;
+    message.textContent = text;
+
+    clearTimeout(window.messageTimer);
+
+    window.messageTimer = setTimeout(() => {
+    message.className = "message";
+    }, 2000);
+    }
+
+    function castVote(id, type) {
+    const item = items.find(item => item.id === id);
+
+    if (!item) return;
+
+    item[type]++;
+
+    renderItems();
+    updateResults();
+    }
+
+    function renderItems() {
+    itemList.innerHTML = "";
+
+    if (items.length === 0) {
+    itemList.innerHTML = `
+    <div class="empty">
+    No items yet.<br>
+    Add an item to start voting!
+    </div>
+    `;
+    return;
+    }
+
+    items.forEach(item => {
+    const total = item.loved + item.liked + item.tried;
+
+    const card = document.createElement("div");
+    card.className = "item-card";
+
+    const header = document.createElement("div");
+    header.className = "item-header";
+
+    const name = document.createElement("span");
+    name.className = "item-name";
+    name.textContent = item.name;
+
+    const count = document.createElement("span");
+    count.className = "item-total";
+    count.textContent = total + " votes";
+
+    header.append(name, count);
+
+    const buttons = document.createElement("div");
+    buttons.className = "item-votes";
+
+    const choices = [
+    {
+    type: "loved",
+    emoji: "❤️",
+    label: "Loved It"
+    },
+    {
+    type: "liked",
+    emoji: "👍",
+    label: "Liked It"
+    },
+    {
+    type: "tried",
+    emoji: "😊",
+    label: "Tried It"
+    }
+    ];
+
+    choices.forEach(choice => {
+    const button = document.createElement("button");
+
+    button.type = "button";
+    button.className = "item-vote";
+
+    const number = document.createElement("strong");
+    number.textContent = choice.emoji + " " + item[choice.type];
+
+    const label = document.createElement("span");
+    label.textContent = choice.label;
+
+    button.append(number, label);
+
+    button.addEventListener("click", () => {
+    castVote(item.id, choice.type);
+    });
+
+    buttons.appendChild(button);
+    });
+
+    card.append(header, buttons);
+
+    itemList.appendChild(card);
+    });
+    }
+
+    function updateResults() {
+    let loved = 0;
+    let liked = 0;
+    let tried = 0;
+
+    items.forEach(item => {
+    loved += item.loved;
+    liked += item.liked;
+    tried += item.tried;
+    });
+
+    const total = loved + liked + tried;
+
+    document.getElementById("total").textContent = total;
+
+    document.getElementById("lovedCount").textContent = loved;
+    document.getElementById("likedCount").textContent = liked;
+    document.getElementById("triedCount").textContent = tried;
+
+    document.getElementById("lovedBar").style.width =
+    (total ? loved / total * 100 : 0) + "%";
+
+    document.getElementById("likedBar").style.width =
+    (total ? liked / total * 100 : 0) + "%";
+
+    document.getElementById("triedBar").style.width =
+    (total ? tried / total * 100 : 0) + "%";
+    }
+
+    addForm.addEventListener("submit", addItem);
+
+    // Initial empty state
+    renderItems();
+    updateResults();
+    </script>
+
+  </body>
+</html>
+

@@ -8,13 +8,9 @@
   git clone git@github.com:ayushkpai/voter.git
   ```
 
-- Next install ruby and rails
-
-  Also documented in dotfiles
-
 - To run the project
 
   ```
-  ./bin/dev
+  open index.html
   ```
 
